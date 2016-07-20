@@ -18,8 +18,8 @@ var User   = require('./app/models/user'); // get our mongoose model
 // =======================
 // configuration =========
 // =======================
-var port = process.env.OPENSHIFT_NODEJS_PORT || 3500; // used to create, sign, and verify tokens
-var ipAddress = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
+var port = process.env.OPENSHIFT_NODEJS_PORT || 3000; // used to create, sign, and verify tokens
+var ipAddress = process.env.OPENSHIFT_NODEJS_IP || "0.0.0.0";
 // default to a 'localhost' configuration:
 var connection_string = config.database;
 // if OPENSHIFT env variables are present, use the available connection info:
@@ -52,7 +52,8 @@ app.use(function(req, res, next) {
 // =======================
 // basic route
 app.get('/', function(req, res) {
-    res.send('Hello! The API is at ip:' + port + '/api');
+    //res.send('Hello! The API is at ip:' + port + '/api');
+    res.send('Hello! The API is at ' + '/api');
 });
 
 // API ROUTES -------------------
@@ -75,8 +76,11 @@ apiRoutes.post('/authenticate', function(req, res) {
       res.json({ success: false, message: 'Authentication failed. User not found.' });
     } else if (user) {
 
-      // check if password matches
-      if (user.password != req.body.password) {
+    
+    // Load password hash from DB
+    bcrypt.compare(req.body.password, user.password, function(err, sameRes) {
+        // check if password matches
+      if (!sameRes) {
         res.json({ success: false, message: 'Authentication failed. Wrong password.' });
       } else {
 
@@ -93,6 +97,8 @@ apiRoutes.post('/authenticate', function(req, res) {
           token: token
         });
       }   
+      
+    });
 
     }
 
@@ -217,7 +223,7 @@ app.get('/setup', function(req, res) {
         else console.log ('Sucess:' , data);
     });*/
     
-    // create a sample user
+    /*// create a sample user
     var rainnier = new User({ 
     name: 'Rainnier', 
     password: 'rainnier',
@@ -230,7 +236,66 @@ app.get('/setup', function(req, res) {
         
         console.log('User saved successfully');
         res.json({ success: true });
+    });*/
+    /*// create a sample user
+    var a = new User({ 
+    name: 'Gian', 
+    password: 'gian',
+    admin: true 
     });
+    
+    // save the sample user
+    a.save(function(err) {
+        if (err) throw err;
+        
+        console.log('User saved successfully');
+        res.json({ success: true });
+    });
+    
+    // create a sample user
+    var b = new User({ 
+    name: 'Peire', 
+    password: 'peire',
+    admin: false
+    });
+    
+    // save the sample user
+    b.save(function(err) {
+        if (err) throw err;
+        
+        console.log('User saved successfully');
+        res.json({ success: true });
+    });
+    
+    // create a sample user
+    var c = new User({ 
+    name: 'Jizell', 
+    password: 'jizell',
+    admin: false 
+    });
+    
+    // save the sample user
+    c.save(function(err) {
+        if (err) throw err;
+        
+        console.log('User saved successfully');
+        res.json({ success: true });
+    });
+    
+    // create a sample user
+    var d = new User({ 
+    name: 'Erwin', 
+    password: 'erwin',
+    admin: false 
+    });
+    
+    // save the sample user
+    d.save(function(err) {
+        if (err) throw err;
+        
+        console.log('User saved successfully');
+        res.json({ success: true });
+    });*/
 
 });
 
@@ -240,5 +305,5 @@ app.get('/setup', function(req, res) {
 // =======================
 
 var server = app.listen(port, ipAddress, function(){
-  console.log('Magic happens at ' + ipAddress + ":" + port);
+  console.log('Magic is happening now...');
 });
